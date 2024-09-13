@@ -1,7 +1,7 @@
 # Grade Melon
 Backend server for https://Grademelon.org
 
-![static-site](public/images/logo.png)
+![static-site](public/logo.png)
 
 Methods:
 
