@@ -6,6 +6,7 @@
   "author": "alphasec",
   "license": "MIT",
   "dependencies": {
+     "dotenv": "^16.0.3",
     "express": "^4.19.2",
     "axios": "^1.7.2",
      "axios-cookiejar-support": "^5.0.2",
