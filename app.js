@@ -35,13 +35,38 @@ function decryptDetails(req){
     return(details)
 }
 
+
+function parseFormData(loginPage){
+    const parser = new DOMParser();
+
+// Parse the HTML string into a DOM Document
+const doc = parser.parseFromString(loginPage, 'text/html');
+
+// Find the elements by their IDs
+const viewStateElement = doc.getElementById('__VIEWSTATE');
+const eventValidationElement = doc.getElementById('__EVENTVALIDATION');
+
+// Extract the value attributes
+const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
+const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
+
+return [_VIEWSTATE,_EVENTVALIDATION]
+
+
+
+    
+}
+
+
+
 async function logIn(details,session) {
     try{
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
+    const VIEWSTATE,EVENTVALIDATION=parseFormDataawait(await axios.get(url));
     const data = new FormData();
-    data.append('__VIEWSTATE', 'xSUJwarOjTQE7CskHQblb19ssBCBpUW+5tfdNDuD3IcYmgxmrAGdCkRQBXImdT8UDBRZUWGKh1WbTZ5Sjneh/pHvZfC9OS9G/dvguNcLVQQ=');
-    data.append('__EVENTVALIDATION', 'MuxKAkL0uqFFwLLJFLrjlv9DhfP/xcGj5sOrlMYih54BCkfxr2cabxYxCi4hecln+T2qPKNaTFbQWvZzISA0REDWrFIt/4YxP7E7ZdNiop+fTihWPxDD81Brd70gdCgpKWeQp7cfRdrkvCZULYF4ZcMI330jEDOCyKbmjCTImRA=');
+    data.append('__VIEWSTATE', VIEWSTATE);
+    data.append('__EVENTVALIDATION', EVENTVALIDATION);
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
