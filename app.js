@@ -7,6 +7,7 @@ const CryptoJS = require('crypto-js');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const { JSDOM } = require('jsdom');
 
 const encryptionKey = process.env.encryptionkey;
 
@@ -36,25 +37,17 @@ function decryptDetails(req){
 }
 
 
-function parseFormData(loginPage){
-    const parser = new DOMParser();
+function parseFormData(loginPage) {
+    const dom = new JSDOM(loginPage);
+    const document = dom.window.document;
 
-// Parse the HTML string into a DOM Document
-const doc = parser.parseFromString(loginPage, 'text/html');
+    const viewStateElement = document.getElementById('__VIEWSTATE');
+    const eventValidationElement = document.getElementById('__EVENTVALIDATION');
 
-// Find the elements by their IDs
-const viewStateElement = doc.getElementById('__VIEWSTATE');
-const eventValidationElement = doc.getElementById('__EVENTVALIDATION');
+    const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
+    const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
 
-// Extract the value attributes
-const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
-const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
-
-return [_VIEWSTATE,_EVENTVALIDATION]
-
-
-
-    
+    return [_VIEWSTATE, _EVENTVALIDATION];
 }
 
 
