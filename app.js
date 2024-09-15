@@ -30,7 +30,7 @@ function decryptDetails(req){
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
     const details=req.body;
     details.credentials.password=originalText;
-    //console.log(details)
+    console.log(details)
     return(details)
 }
 
@@ -54,10 +54,10 @@ async function logIn(details,session) {
 
         await session.post(url, data, { headers })
             .then(login =>{
-        //console.log(login.status);
-        //console.log(login.statusText);
+        console.log(login.status);
+        console.log(login.statusText);
         if (login.data.includes("Good")){
-            //console.log("Logged in");
+            console.log("Logged in");
             res();
         } else {
         rej(new Error("Incorrect Username or Password"))
@@ -69,18 +69,18 @@ async function logIn(details,session) {
 app.post('/getStudentPhoto',async (req, res)=>{
     try{
     const details=decryptDetails(req);;
-    //console.log(details)
+    console.log(details)
     new Promise(async(res,rej)=>{
         await axios.get(details.domain+"/"+details.url,{headers:{
             "Referer":details.domain+"/PXP2_Documents.aspx?AGU=0","Cookie":details.cookies},responseType: 'arraybuffer' })
             .then(file=>{
-                //console.log("YIPEE")
-                //console.log("Content-Type:", file.headers['content-type']);
+                console.log("YIPEE")
+                console.log("Content-Type:", file.headers['content-type']);
                 res(file.data)
 
             })
             .catch(error=>{
-                //console.log("oh no")
+                console.log("oh no")
                 if(error.message.includes("403")){rej(new Error("Link/Authentication Expired"))}
                 if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
                 console.error(error.message);
@@ -98,11 +98,11 @@ app.post("/getStudentInfo",async(req,res)=>{
     const details=decryptDetails(req);;
     new Promise(async(res,rej)=>{
         details.headers.Cookie=details.cookies;
-        //console.log("print debug")
-        //console.log(details.headers)
+        console.log("print debug")
+        console.log(details.headers)
         await axios.get(details.domain+"/"+"PXP2_Student.aspx?AGU=0",{'headers':details.headers})
             .then(page=>{
-                //console.log("type shit")
+                console.log("type shit")
                 res(page.data)
             })
             .catch(error=>{
@@ -119,24 +119,24 @@ app.post("/getStudentInfo",async(req,res)=>{
 app.post("/getDocument",async(req,res)=>{
     try{
     const details=decryptDetails(req);;
-    //console.log(details)
+    console.log(details)
     new Promise(async(res,rej)=>{
-        //console.log("here we go i guess!!!")
+        console.log("here we go i guess!!!")
         await axios.get(details.domain+"/"+details.url,{headers:{"Sec-Fetch-Site": "same-origin",
             "Sec-Fetch-Mode": "navigate",
             "Sec-Fetch-User": "?1",
             "Sec-Fetch-Dest": "document",
             "Referer":details.domain+"/PXP2_Documents.aspx?AGU=0","Cookie":details.cookies},responseType: 'arraybuffer' })
             .then(file=>{
-                //console.log("YIPEE")
-                //console.log("Content-Type:", file.headers['content-type']);
+                console.log("YIPEE")
+                console.log("Content-Type:", file.headers['content-type']);
                 if(file.headers['content-type']=="application/pdf"){
-                //console.log(file.data.data)
+                console.log(file.data.data)
                 res(file.data);}else{rej(new Error("Unknown Error"))}
 
             })
             .catch(error=>{
-                //console.log("oh no")
+                console.log("oh no")
                 if(error.message.includes("403")){rej(new Error("Link/Authentication Expired"))}
                 if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
                 console.error(error.message);
@@ -153,7 +153,7 @@ app.post("/getDocuments",async(req,res)=>{
     new Promise(async(res,rej)=>{
             try{
             const url = details.domain+"/PXP2_Documents.aspx?AGU=0";
-            //console.log("here we go!!!")
+            console.log("here we go!!!")
             await axios.get(url,{headers:{"Cookie":details.cookies}})
                 .then(response=>{
                     if(response.data.includes("ParentVUE and StudentVUE Access")){rej(new Error("Authentication Cookies Expired"))};
@@ -161,13 +161,13 @@ app.post("/getDocuments",async(req,res)=>{
                                 })
                 .catch(err=>{
                     if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
-                //console.log(err)
+                console.log(err)
                 rej(err)})
     
     
         }
         catch(error){
-        //console.log("okay now I'm confused")
+        console.log("okay now I'm confused")
         rej(error)}
         }).then(res1=>{res.json({status:true,doc:res1});}).catch(error=>{
             res.json({status:false,message:error.message})})
@@ -209,18 +209,18 @@ app.post("/getHomePageGrades",async(req,res)=>{
 
 async function getAssignments(details){
     return new Promise(async(res,rej)=>{
-   // console.log(details.senddata);
+   console.log(details.senddata);
     try{
             const headers = {
     'Origin': details.domain,
     'Referer': details.domain+'/PXP2_GradeBook.aspx?AGU=0',
     'Cookie':details.cookies
 };
-//console.log(headers)
+console.log(headers)
     await axios.post(details.domain+"/service/PXP2Communication.asmx/LoadControl",details.senddata,{headers:headers})
-     var response3 = await axios.post(details.domain+"/api/GB/ClientSideData/Transfer?action=genericdata.classdata-GetClassData",{"FriendlyName":"genericdata.classdata","Method":"GetClassData","Parameters":"{}"},{headers:headers}).catch(error=>{if(error.message.includes("404")){//console.log("it's me response 3");
+     var response3 = await axios.post(details.domain+"/api/GB/ClientSideData/Transfer?action=genericdata.classdata-GetClassData",{"FriendlyName":"genericdata.classdata","Method":"GetClassData","Parameters":"{}"},{headers:headers}).catch(error=>{if(error.message.includes("404")){console.log("it's me response 3");
         var response3=null}});
-        var response2= await axios.post(details.domain+"/api/GB/ClientSideData/Transfer?action=pxp.course.content.items-LoadWithOptions", {"FriendlyName":"pxp.course.content.items","Method":"LoadWithOptions","Parameters":"{\"loadOptions\":{\"sort\":[{\"selector\":\"due_date\",\"desc\":false}],\"filter\":[[\"isDone\",\"=\",false]],\"group\":[{\"Selector\":\"Week\",\"desc\":true}],\"requireTotalCount\":true,\"userData\":{}},\"clientState\":{}}"},{headers:headers}).catch(error=>{if(error.message.includes("404")){//console.log("is this just for show or what?");
+        var response2= await axios.post(details.domain+"/api/GB/ClientSideData/Transfer?action=pxp.course.content.items-LoadWithOptions", {"FriendlyName":"pxp.course.content.items","Method":"LoadWithOptions","Parameters":"{\"loadOptions\":{\"sort\":[{\"selector\":\"due_date\",\"desc\":false}],\"filter\":[[\"isDone\",\"=\",false]],\"group\":[{\"Selector\":\"Week\",\"desc\":true}],\"requireTotalCount\":true,\"userData\":{}},\"clientState\":{}}"},{headers:headers}).catch(error=>{if(error.message.includes("404")){console.log("is this just for show or what?");
             var response2=null}});
     
 }
@@ -251,7 +251,7 @@ app.post("/getAssignments",async(req,res)=>{
             return rej(error)
         }
         // response = await session.post(url, data, { headers });
-        //console.log("what's my name? hiesenburger")
+        console.log("what's my name? hiesenburger")
 
 
     }).then(res1=>{res.json({status:true,assignments:res1});}).catch(error=>{
@@ -263,10 +263,10 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
-   // console.log(req.body);
+   console.log(req.body);
     try{
-    //console.log("listen here, jackass")
-    //console.log(req.body);
+    console.log("listen here, jackass")
+    console.log(req.body);
     if(req.body.needsDecryption==true){var details=decryptDetails(req);}else{var details=req.body;}
     new Promise(async (res, rej)=>{
        const cookieJar = new tough.CookieJar();
@@ -278,8 +278,8 @@ app.post("/refresh",async(req,res)=>{
             .then(res1=>{
                 cookieJar.getCookies(details.domain, (err, cookies) => {
                       cookies="PVUE=ENG; "+cookies[0].key+"="+cookies[0].value + "; " + cookies[2].key + "="+cookies[2].value+";";
-                      //console.log("fuck me sideways")
-                      //console.log(cookies)
+                      console.log("fuck me sideways")
+                      console.log(cookies)
                     res(cookies);
                   });
             })
@@ -300,5 +300,5 @@ app.post("/refresh",async(req,res)=>{
 
 
 app.listen(3000, () => {
-    //console.log('Server is running on port 3000');
+    console.log('Server is running on port 3000');
 });
