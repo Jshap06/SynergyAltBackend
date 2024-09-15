@@ -7,6 +7,7 @@ const CryptoJS = require('crypto-js');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
+const { JSDOM } = require('jsdom');
 
 const encryptionKey = process.env.encryptionkey;
 
@@ -31,27 +32,48 @@ function decryptDetails(req){
     const details=req.body;
     details.credentials.password=originalText;
     //console.log(details)
+    details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
     return(details)
 }
+
+
+function parseFormData(loginPage) {
+    const dom = new JSDOM(loginPage);
+    const document = dom.window.document;
+
+    const viewStateElement = document.getElementById('__VIEWSTATE');
+    const eventValidationElement = document.getElementById('__EVENTVALIDATION');
+
+    const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
+    const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
+    //console.log(_VIEWSTATE);//console.log(_EVENTVALIDATION);
+
+    return [_VIEWSTATE, _EVENTVALIDATION];
+}
+
+
 
 async function logIn(details,session) {
     try{
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
+    const response2 = await axios.get(url)
+    const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
     const data = new FormData();
-    data.append('__VIEWSTATE', 'xSUJwarOjTQE7CskHQblb19ssBCBpUW+5tfdNDuD3IcYmgxmrAGdCkRQBXImdT8UDBRZUWGKh1WbTZ5Sjneh/pHvZfC9OS9G/dvguNcLVQQ=');
-    data.append('__EVENTVALIDATION', 'MuxKAkL0uqFFwLLJFLrjlv9DhfP/xcGj5sOrlMYih54BCkfxr2cabxYxCi4hecln+T2qPKNaTFbQWvZzISA0REDWrFIt/4YxP7E7ZdNiop+fTihWPxDD81Brd70gdCgpKWeQp7cfRdrkvCZULYF4ZcMI330jEDOCyKbmjCTImRA=');
+    data.append('__VIEWSTATE', VIEWSTATE);
+    data.append('__EVENTVALIDATION', EVENTVALIDATION);
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
-    
+
+        
     const headers = {
         'Origin': details.domain,
         'Referer': details.domain + '/PXP2_Login_Student.aspx?Logout=1&regenerateSessionId=True',
         ...(details.cookies && { 'Cookie': details.cookies })
     };
     
-
+        //console.log(url);//console.log(data);//console.log(headers);
         await session.post(url, data, { headers })
             .then(login =>{
         //console.log(login.status);
@@ -209,7 +231,7 @@ app.post("/getHomePageGrades",async(req,res)=>{
 
 async function getAssignments(details){
     return new Promise(async(res,rej)=>{
-   // console.log(details.senddata);
+   //console.log(details.senddata);
     try{
             const headers = {
     'Origin': details.domain,
@@ -224,7 +246,7 @@ async function getAssignments(details){
             var response2=null}});
     
 }
-    catch(error){console.log(error.message);
+    catch(error){//console.log(error.message);
         return rej(error)}
     
         const response3Data = response3 ? response3.data : "null";
@@ -263,12 +285,13 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
-   // console.log(req.body);
+   //console.log(req.body);
     try{
     //console.log("listen here, jackass")
     //console.log(req.body);
     if(req.body.needsDecryption==true){var details=decryptDetails(req);}else{var details=req.body;}
     new Promise(async (res, rej)=>{
+        details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
        const cookieJar = new tough.CookieJar();
         const session = await wrapper(axios.create({
               withCredentials: true,
