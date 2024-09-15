@@ -46,6 +46,7 @@ function parseFormData(loginPage) {
 
     const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
     const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
+    console.log(_VIEWSTATE);console.log(_EVENTVALIDATION);
 
     return [_VIEWSTATE, _EVENTVALIDATION];
 }
@@ -56,7 +57,7 @@ async function logIn(details,session) {
     try{
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
-    const [VIEWSTATE, EVENTVALIDATION]=parseFormData(await axios.get(url));
+    const [VIEWSTATE, EVENTVALIDATION]=parseFormData(await axios.get(url).data);
     const data = new FormData();
     data.append('__VIEWSTATE', VIEWSTATE);
     data.append('__EVENTVALIDATION', EVENTVALIDATION);
