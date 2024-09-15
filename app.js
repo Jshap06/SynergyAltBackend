@@ -53,7 +53,7 @@ async function logIn(details,session) {
         ...(details.cookies && { 'Cookie': details.cookies })
     };
     
-
+        console.log(url);console.log(data);console.log(headers);
         await session.post(url, data, { headers })
             .then(login =>{
         console.log(login.status);
