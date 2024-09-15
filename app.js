@@ -31,6 +31,7 @@ function decryptDetails(req){
     const details=req.body;
     details.credentials.password=originalText;
     console.log(details)
+    details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
     return(details)
 }
 
@@ -44,7 +45,8 @@ async function logIn(details,session) {
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
-    
+
+        
     const headers = {
         'Origin': details.domain,
         'Referer': details.domain + '/PXP2_Login_Student.aspx?Logout=1&regenerateSessionId=True',
@@ -269,6 +271,7 @@ app.post("/refresh",async(req,res)=>{
     console.log(req.body);
     if(req.body.needsDecryption==true){var details=decryptDetails(req);}else{var details=req.body;}
     new Promise(async (res, rej)=>{
+        details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
        const cookieJar = new tough.CookieJar();
         const session = await wrapper(axios.create({
               withCredentials: true,
