@@ -6,9 +6,9 @@ const FormData = require('form-data');
 const CryptoJS = require('crypto-js');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+require('dotenv').config();
 
-
-const encryptionKey="myencryptionkey"
+const encryptionKey = process.env.encryptionkey;
 
 const app = express();
 const limiter = rateLimit({
