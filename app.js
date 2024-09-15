@@ -58,7 +58,7 @@ async function logIn(details,session) {
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
     const response2 = await axios.get(url)
-    const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response.data);
+    const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
     const data = new FormData();
     data.append('__VIEWSTATE', VIEWSTATE);
     data.append('__EVENTVALIDATION', EVENTVALIDATION);
