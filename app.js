@@ -54,7 +54,6 @@ function parseFormData(loginPage) {
 
 
 async function logIn(details,session) {
-    try{
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
     const response2 = await axios.get(url)
@@ -85,7 +84,7 @@ async function logIn(details,session) {
         rej(new Error("Incorrect Username or Password"))
         };}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
-}).catch(error=>{return rej(error)})}catch(error){return({status:false,message:error.message})}}
+})}
 
 
 app.post('/getStudentPhoto',async (req, res)=>{
