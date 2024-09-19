@@ -279,7 +279,8 @@ app.post("/getAssignments",async(req,res)=>{
     try {
         taskMap.set(details.cookies,[getAssignments(details,0)]);
         var result = await taskMap.get(details.cookies)[0];
-    }catch(error){//console.log("idk yet")}}
+    }catch(error){//console.log("idk yet")
+        }}
         try{
             return res(result)
         } catch (error) {
