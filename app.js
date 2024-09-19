@@ -261,11 +261,10 @@ app.post("/getAssignments",async(req,res)=>{
             await taskMap.get(details.cookies);
         }
 
-        const task = getAssignments(details);
-        taskMap.set(details.cookies,task);
+        taskMap.set(details.cookies,getAssignments(details));
 
         try {
-            const result = await task;
+            const result = await taskMap.get(details.cookies);
             taskMap.delete(details.cookies);
             return res(result)
         } catch (error) {
