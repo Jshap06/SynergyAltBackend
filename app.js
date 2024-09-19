@@ -85,7 +85,7 @@ async function logIn(details,session) {
         rej(new Error("Incorrect Username or Password"))
         };}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
-})}catch(error){return({status:false,message:error.message})}}
+}).catch(error=>{return rej(error)})}catch(error){return({status:false,message:error.message})}}
 
 
 app.post('/getStudentPhoto',async (req, res)=>{
@@ -212,7 +212,7 @@ app.post("/getHomePageGrades",async(req,res)=>{
         'Referer': details.domain+'/PXP2_GradeBook.aspx?AGU=0',
         'Cookie':details.cookies
     };
-
+    try{
         await axios.get(details.domain+"/PXP2_GradeBook.aspx?AGU=0"+details.selector,{headers:headers})
         .then(response=>{
             if(response.data.includes("Internal Serer Error")){return rej(new Error("Authentication Cookies Expired"))};
@@ -220,9 +220,9 @@ app.post("/getHomePageGrades",async(req,res)=>{
         })
         .catch(error=>{
             if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){return rej(new Error("Network Error: Try Again Shortly"))}
-            rej(new Error(error))})
+            rej(error)})
         //const response = await session.post(url, data, { headers });
-
+    }catch(error=>{return rej(error)})
 }).then(res1=>{res.json({status:true,grades:res1});}).catch(error=>{
     res.status(200).json({status:false,message:error.message})})
 
