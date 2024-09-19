@@ -318,13 +318,14 @@ app.post("/refresh",async(req,res)=>{
             .catch(rej1=>{
                 if (rej1.message.includes("key")){res(details.cookies)}else{
                     if(rej1.message.includes("hung up")||rej1.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}else{
+                        console.log("what now");console.log(rej1)
                 rej(rej1)}}})
     
-    }).then(res1=>{res.json({status:true,cookies:res1,encrpytedPassword:CryptoJS.AES.encrypt(details.credentials.password, encryptionKey).toString()});}).catch(error=>{
+    }).then(res1=>{res.json({status:true,cookies:res1,encrpytedPassword:CryptoJS.AES.encrypt(details.credentials.password, encryptionKey).toString()});}).catch(error=>{console.log("oh ho ho");console.log(error);
         res.status(200).json({status:false,message:error.message})})
 
 
-}catch(error){res.json({status:false,message:error.message})}})
+}catch(error){console.log("DAMN");console.log(error);res.json({status:false,message:error.message})}})
 
 
 //the KEY to maintaing decent workability is when u refresh the auth cookies, try to just reauthenticate the same session rather than spawning new cookies. should prob replace them while true loops in client with like a 3 count, and tell it to regen cookies after 3 consecutive failures
