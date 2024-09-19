@@ -31,7 +31,7 @@ function decryptDetails(req){
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
     const details=req.body;
     details.credentials.password=originalText;
-    //console.log(details)
+    ////console.log(details)
     details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
     return(details)
 }
@@ -46,7 +46,7 @@ function parseFormData(loginPage) {
 
     const _VIEWSTATE = viewStateElement ? viewStateElement.value : null;
     const _EVENTVALIDATION = eventValidationElement ? eventValidationElement.value : null;
-    //console.log(_VIEWSTATE);//console.log(_EVENTVALIDATION);
+    ////console.log(_VIEWSTATE);////console.log(_EVENTVALIDATION);
 
     return [_VIEWSTATE, _EVENTVALIDATION];
 }
@@ -73,13 +73,13 @@ async function logIn(details,session) {
         ...(details.cookies && { 'Cookie': details.cookies })
     };
     
-        //console.log(url);//console.log(data);//console.log(headers);
+        ////console.log(url);////console.log(data);////console.log(headers);
         await session.post(url, data, { headers })
             .then(login =>{
-        //console.log(login.status);
-        //console.log(login.statusText);
+        ////console.log(login.status);
+        ////console.log(login.statusText);
         if (login.data.includes("Good")){
-            //console.log("Logged in");
+            ////console.log("Logged in");
             res();
         } else {
         rej(new Error("Incorrect Username or Password"))
@@ -91,18 +91,18 @@ async function logIn(details,session) {
 app.post('/getStudentPhoto',async (req, res)=>{
     try{
     const details=decryptDetails(req);;
-    //console.log(details)
+    ////console.log(details)
     new Promise(async(res,rej)=>{
         await axios.get(details.domain+"/"+details.url,{headers:{
             "Referer":details.domain+"/PXP2_Documents.aspx?AGU=0","Cookie":details.cookies},responseType: 'arraybuffer' })
             .then(file=>{
-                //console.log("YIPEE")
-                //console.log("Content-Type:", file.headers['content-type']);
+                ////console.log("YIPEE")
+                ////console.log("Content-Type:", file.headers['content-type']);
                 res(file.data)
 
             })
             .catch(error=>{
-                //console.log("oh no")
+                ////console.log("oh no")
                 if(error.message.includes("403")){rej(new Error("Link/Authentication Expired"))}
                 if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
                 console.error(error.message);
@@ -120,11 +120,11 @@ app.post("/getStudentInfo",async(req,res)=>{
     const details=decryptDetails(req);;
     new Promise(async(res,rej)=>{
         details.headers.Cookie=details.cookies;
-        //console.log("print debug")
-        //console.log(details.headers)
+        ////console.log("print debug")
+        ////console.log(details.headers)
         await axios.get(details.domain+"/"+"PXP2_Student.aspx?AGU=0",{'headers':details.headers})
             .then(page=>{
-                //console.log("type shit")
+                ////console.log("type shit")
                 res(page.data)
             })
             .catch(error=>{
@@ -141,24 +141,24 @@ app.post("/getStudentInfo",async(req,res)=>{
 app.post("/getDocument",async(req,res)=>{
     try{
     const details=decryptDetails(req);;
-    //console.log(details)
+    ////console.log(details)
     new Promise(async(res,rej)=>{
-        //console.log("here we go i guess!!!")
+        ////console.log("here we go i guess!!!")
         await axios.get(details.domain+"/"+details.url,{headers:{"Sec-Fetch-Site": "same-origin",
             "Sec-Fetch-Mode": "navigate",
             "Sec-Fetch-User": "?1",
             "Sec-Fetch-Dest": "document",
             "Referer":details.domain+"/PXP2_Documents.aspx?AGU=0","Cookie":details.cookies},responseType: 'arraybuffer' })
             .then(file=>{
-                //console.log("YIPEE")
-                //console.log("Content-Type:", file.headers['content-type']);
+                ////console.log("YIPEE")
+                ////console.log("Content-Type:", file.headers['content-type']);
                 if(file.headers['content-type']=="application/pdf"){
-                //console.log(file.data.data)
+                ////console.log(file.data.data)
                 res(file.data);}else{rej(new Error("Unknown Error"))}
 
             })
             .catch(error=>{
-                //console.log("oh no")
+                ////console.log("oh no")
                 if(error.message.includes("403")){rej(new Error("Link/Authentication Expired"))}
                 if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
                 console.error(error.message);
@@ -175,7 +175,7 @@ app.post("/getDocuments",async(req,res)=>{
     new Promise(async(res,rej)=>{
             try{
             const url = details.domain+"/PXP2_Documents.aspx?AGU=0";
-            //console.log("here we go!!!")
+            ////console.log("here we go!!!")
             await axios.get(url,{headers:{"Cookie":details.cookies}})
                 .then(response=>{
                     if(response.data.includes("ParentVUE and StudentVUE Access")){rej(new Error("Authentication Cookies Expired"))};
@@ -183,13 +183,13 @@ app.post("/getDocuments",async(req,res)=>{
                                 })
                 .catch(err=>{
                     if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}
-                //console.log(err)
+                ////console.log(err)
                 rej(err)})
     
     
         }
         catch(error){
-        //console.log("okay now I'm confused")
+        ////console.log("okay now I'm confused")
         rej(error)}
         }).then(res1=>{res.json({status:true,doc:res1});}).catch(error=>{
             res.json({status:false,message:error.message})})
@@ -229,9 +229,20 @@ app.post("/getHomePageGrades",async(req,res)=>{
 });
 
 
-async function getAssignments(details){
+async function getAssignments(details,index){
+    //this whole taskMap system has two BIG issues, ONE, it's a memory drain, things are never deleted, that's a problem, a daily task to delete could maybe help fix this, but, not great.
+//TWO, it slows things down. if you refresh fast enough, things will get slow as the queue will get bloated, and even though a request is first sent for the currently viewed assignment page, it will be behind all those 
+    //others. Either a solution needs to be found for dealing with changing indexes, so this could be placed futher up, or smthn else idk. this whole thing bloats memory a fucking bunch. 
+//alternatively, one could run immediate execution by grabbing a fresh and unique set of session cookies to be used JUST for the one response
     return new Promise(async(res,rej)=>{
+               if(taskMap.has(details.cookies)){
+            await taskMap.get(details.cookies)[index];
+            taskMap.get(details.cookies)[index]="";
+        }
    //console.log(details.senddata);
+             if(taskMap.has(details.cookies)){
+            await taskMap.get(details.cookies)[index];
+        }
     try{
             const headers = {
     'Origin': details.domain,
@@ -257,19 +268,21 @@ async function getAssignments(details){
 app.post("/getAssignments",async(req,res)=>{
     return new Promise(async (res, rej)=>{ 
         var details=req.body;
+        //console.log(taskMap);
         if(taskMap.has(details.cookies)){
-            await taskMap.get(details.cookies);
+            if(!taskMap.get(details.cookies).some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[getAssignments(details,0)]);var result = await taskMap.get(details.cookies)[0];}
+            else{
+            taskMap.get(details.cookies).push(getAssignments(details,taskMap.get(details.cookies).length-1))
+            var result=await taskMap.get(details.cookies)[taskMap.get(details.cookies).length-1];}
         }
-
-        const task = getAssignments(details);
-        taskMap.set(details.cookies,task);
-
-        try {
-            const result = await task;
-            taskMap.delete(details.cookies);
+        else{
+    try {
+        taskMap.set(details.cookies,[getAssignments(details,0)]);
+        var result = await taskMap.get(details.cookies)[0];
+    }catch(error){//console.log("idk yet")}}
+        try{
             return res(result)
         } catch (error) {
-            taskMap.delete(details.cookies);
             return rej(error)
         }
         // response = await session.post(url, data, { headers });
@@ -283,12 +296,11 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 
-
 app.post("/refresh",async(req,res)=>{
-   //console.log(req.body);
+   ////console.log(req.body);
     try{
-    //console.log("listen here, jackass")
-    //console.log(req.body);
+    ////console.log("listen here, jackass")
+    ////console.log(req.body);
     if(req.body.needsDecryption==true){var details=decryptDetails(req);}else{var details=req.body;}
     new Promise(async (res, rej)=>{
         details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
@@ -301,8 +313,8 @@ app.post("/refresh",async(req,res)=>{
             .then(res1=>{
                 cookieJar.getCookies(details.domain, (err, cookies) => {
                       cookies="PVUE=ENG; "+cookies[0].key+"="+cookies[0].value + "; " + cookies[2].key + "="+cookies[2].value+";";
-                      //console.log("fuck me sideways")
-                      //console.log(cookies)
+                      ////console.log("fuck me sideways")
+                      ////console.log(cookies)
                     res(cookies);
                   });
             })
@@ -323,5 +335,5 @@ app.post("/refresh",async(req,res)=>{
 
 
 app.listen(3000, () => {
-    //console.log('Server is running on port 3000');
+    ////console.log('Server is running on port 3000');
 });
