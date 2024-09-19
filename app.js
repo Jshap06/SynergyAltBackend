@@ -229,9 +229,16 @@ app.post("/getHomePageGrades",async(req,res)=>{
 });
 
 
-async function getAssignments(details){
+async function getAssignments(details,index){
     return new Promise(async(res,rej)=>{
+               if(taskMap.has(details.cookies)){
+            await taskMap.get(details.cookies)[index];
+            taskMap.get(details.cookies)[index]="";
+        }
    console.log(details.senddata);
+             if(taskMap.has(details.cookies)){
+            await taskMap.get(details.cookies)[index];
+        }
     try{
             const headers = {
     'Origin': details.domain,
@@ -259,17 +266,19 @@ app.post("/getAssignments",async(req,res)=>{
         var details=req.body;
         console.log(taskMap);
         if(taskMap.has(details.cookies)){
-            await taskMap.get(details.cookies);
+            if(!taskMap.get(details.cookies).some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[getAssignments(details,0)]);var result = await taskMap.get(details.cookies)[0];}
+            else{
+            taskMap.get(details.cookies).push(getAssignments(details,taskMap.get(details.cookies).length-1))
+            var result=await taskMap.get(details.cookies)[taskMap.get(details.cookies).length-1];}
         }
+        else{
     try {
-        taskMap.set(details.cookies,getAssignments(details));
-
-    
-            const result = await taskMap.get(details.cookies);
-            taskMap.delete(details.cookies);
+        taskMap.set(details.cookies,[getAssignments(details,0)]);
+        var result = await taskMap.get(details.cookies)[0];
+    }catch(error){console.log("idk yet")}}
+        try{
             return res(result)
         } catch (error) {
-            taskMap.delete(details.cookies);
             return rej(error)
         }
         // response = await session.post(url, data, { headers });
