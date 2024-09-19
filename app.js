@@ -83,7 +83,7 @@ async function logIn(details,session) {
             res();
         } else if(login.data.includes("Invalid")){
         rej(new Error("Incorrect Username or Password"))
-        }else{rej(new Error("Unknown Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
+        }else{rej(new Error("Unknown Error"));console.log(login.data);};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
 })}catch(error){return({status:false,message:error.message})}}
 
