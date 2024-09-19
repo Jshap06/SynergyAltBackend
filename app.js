@@ -257,13 +257,14 @@ console.log(headers)
 app.post("/getAssignments",async(req,res)=>{
     return new Promise(async (res, rej)=>{ 
         var details=req.body;
+        console.log(taskMap);
         if(taskMap.has(details.cookies)){
             await taskMap.get(details.cookies);
         }
-
+    try {
         taskMap.set(details.cookies,getAssignments(details));
 
-        try {
+    
             const result = await taskMap.get(details.cookies);
             taskMap.delete(details.cookies);
             return res(result)
