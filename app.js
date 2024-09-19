@@ -222,7 +222,7 @@ app.post("/getHomePageGrades",async(req,res)=>{
             if(error.message.includes("hung up")||error.message.includes("ENOTFOUND")){return rej(new Error("Network Error: Try Again Shortly"))}
             rej(error)})
         //const response = await session.post(url, data, { headers });
-    }catch(error=>{return rej(error)})
+    }catch(error){return rej(error)}
 }).then(res1=>{res.json({status:true,grades:res1});}).catch(error=>{
     res.status(200).json({status:false,message:error.message})})
 
