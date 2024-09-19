@@ -82,7 +82,7 @@ async function logIn(details,session) {
             res();
         } else if(login.data.includes("Invalid")){
         rej(new Error("Incorrect Username or Password"))
-        }else{new Error("Unknown Erro")};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
+        }else{rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
 })}
 
