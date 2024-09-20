@@ -32,7 +32,7 @@ function decryptDetails(req){
     const details=req.body;
     details.credentials.password=originalText;
     ////console.log(details)
-    details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
+    details.domain= details.domain?.endsWith('/') ? details.domain?.slice(0, -1) : details.domain;
     return(details)
 }
 
@@ -116,7 +116,7 @@ app.post('/getStudentPhoto',async (req, res)=>{
 
 app.post("/getStudentInfo",async(req,res)=>{
     try{
-    const details=decryptDetails(req);;
+    const details=decryptDetails(req);
     new Promise(async(res,rej)=>{
         details.headers.Cookie=details.cookies;
         ////console.log("print debug")
@@ -303,7 +303,7 @@ app.post("/refresh",async(req,res)=>{
     ////console.log(req.body);
     if(req.body.needsDecryption==true){var details=decryptDetails(req);}else{var details=req.body;}
     new Promise(async (res, rej)=>{
-        details.domain = details.domain.endsWith('/') ? details.domain.slice(0, -1) : details.domain;
+        details.domain = details.domain?.endsWith('/') ? details.domain?.slice(0, -1) : details.domain;
        const cookieJar = new tough.CookieJar();
         const session = await wrapper(axios.create({
               withCredentials: true,
