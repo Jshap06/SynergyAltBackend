@@ -29,6 +29,7 @@ app.use(cors());
 app.use(limiter);
 
 setInterval(()=>{
+    console.log(taskMap);
     for(const [key,value] of taskMap){
         if(Date.now()-value[0] > 30*60*1000){
             taskMap.delete(key)
