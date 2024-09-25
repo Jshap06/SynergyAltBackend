@@ -12,9 +12,11 @@ const { JSDOM } = require('jsdom');
 const encryptionKey = process.env.encryptionkey;
 
 const app = express();
+
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 5 minutes
-    max: 1000000, // Limit each IP to 100 requests per windowMs
+    max: 10000, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
     headers: true, // Adds RateLimit headers to responses
   });
@@ -25,6 +27,16 @@ const taskMap = new Map();
 app.use(express.json());
 app.use(cors());
 app.use(limiter);
+
+setInterval(()=>{
+    for(const [key,value] of taskMap){
+        if(Date.now()-value[0] > 30*60*1000){
+            taskMap.delete(key)
+        }
+
+    }
+
+},1800000);
 
 function decryptDetails(req){
     const bytes = CryptoJS.AES.decrypt(req.body.credentials.password, encryptionKey);
@@ -235,12 +247,12 @@ async function getAssignments(details,index){
 //alternatively, one could run immediate execution by grabbing a fresh and unique set of session cookies to be used JUST for the one response
     return new Promise(async(res,rej)=>{
                if(taskMap.has(details.cookies)){
-            await taskMap.get(details.cookies)[index];
-            taskMap.get(details.cookies)[index]="";
+            await taskMap.get(details.cookies)[1][index];
+            taskMap.get(details.cookies)[1][index]="";
         }
    //console.log(details.senddata);
              if(taskMap.has(details.cookies)){
-            await taskMap.get(details.cookies)[index];
+            await taskMap.get(details.cookies)[1][index];
         }
     try{
             const headers = {
@@ -263,21 +275,22 @@ async function getAssignments(details,index){
         const response2Data = response2 ? response2.data : "null";
         res([response3Data, response2Data]);
 })}
-
+//each entry in the map is a session cookie, linked to a list, the list contains promises that correspond to the getAssignments function,
+//the function contains a paremeter which serves as a pointer to the entry in the list it must await
 app.post("/getAssignments",async(req,res)=>{
     return new Promise(async (res, rej)=>{ 
         var details=req.body;
         //console.log(taskMap);
         if(taskMap.has(details.cookies)){
-            if(!taskMap.get(details.cookies).some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[getAssignments(details,0)]);var result = await taskMap.get(details.cookies)[0];}
+            if(!taskMap.get(details.cookies)[1].some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[Date.now(),[getAssignments(details,0)]]);var result = await taskMap.get(details.cookies)[1][0];}
             else{
-            taskMap.get(details.cookies).push(getAssignments(details,taskMap.get(details.cookies).length-1))
-            var result=await taskMap.get(details.cookies)[taskMap.get(details.cookies).length-1];}
+            taskMap.get(details.cookies)[1].push(getAssignments(details,taskMap.get(details.cookies)[1].length-1))
+            var result=await taskMap.get(details.cookies)[1][taskMap.get(details.cookies).length-1];}
         }
         else{
     try {
-        taskMap.set(details.cookies,[getAssignments(details,0)]);
-        var result = await taskMap.get(details.cookies)[0];
+        taskMap.set(details.cookies,[Date.now(),[getAssignments(details,0)]]);
+        var result = await taskMap.get(details.cookies)[1][0];
     }catch(error){//console.log("idk yet")
         }}
         try{
