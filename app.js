@@ -33,7 +33,7 @@ const speedLimiter = slowDown({
 const taskMap = new Map();
 
 app.use(ipBan);
-app.use(speedLimiter)
+//app.use(speedLimiter) no can do, school is all one big ip...
 app.use(express.json());
 app.use(cors());
 
