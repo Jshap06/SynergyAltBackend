@@ -16,7 +16,7 @@ const bannedIps=process.env.banList;
 const app = express();
 
 
-const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){res.status(405).send("u been banned")};next()};
+const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
