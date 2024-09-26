@@ -23,6 +23,7 @@ const speedLimiter = slowDown({
   delayAfter: 100,
   delayMs: 500,
   keyGenerator:(req,res)=>{
+    console.log(req.headers['x-forwarded-for']);
     return req.headers['x-forwarded-for'].split(',')[0]
   },
   onLimitReached: (req, res, options) => {
