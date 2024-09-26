@@ -39,6 +39,7 @@ const taskMap = new Map();
 app.use(express.json());
 app.use(cors());
 app.use(limiter);
+app.use(checkIPBan);
 
 setInterval(()=>{
     console.log(taskMap);
