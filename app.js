@@ -16,14 +16,13 @@ const bannedIps=process.env.banList;
 const app = express();
 
 
-const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");next()};
+const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){res.status(405).send("u been banned")};next()};
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 100,
   delayMs: 500,
   keyGenerator:(req,res)=>{
-    console.log(req.headers['x-forwarded-for']);
     return req.headers['x-forwarded-for'].split(',')[0]
   },
   onLimitReached: (req, res, options) => {
