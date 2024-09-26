@@ -11,21 +11,29 @@ const { JSDOM } = require('jsdom');
 const slowDown = require("express-slow-down");
 
 const encryptionKey = process.env.encryptionkey;
+const bannedIps=process.env.banList;
 
 const app = express();
 
+
+const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");next()};
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 100,
   delayMs: 500,
+  keyGenerator:(req,res)=>{
+    console.log(req.headers['x-forwarded-for']);
+    return req.headers['x-forwarded-for'].split(',')[0]
+  },
   onLimitReached: (req, res, options) => {
-    console.log(`Limit reached for IP: ${req.ip}`);
+    console.log(`Limit reached for IP: ${req.headers['x-forwarded-for'].split(',')[0]}`);
   },
 });
 
 const taskMap = new Map();
 
+app.use(ipBan);
 app.use(speedLimiter)
 app.use(express.json());
 app.use(cors());
@@ -75,9 +83,6 @@ async function logIn(details,session) {
     try{
     const response2 = await axios.get(url).catch(error=>{return rej(error)})
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
-    console.log(typeof VIEWSTATE, VIEWSTATE);
-    console.log(typeof EVENTVALIDATION, EVENTVALIDATION);
-    console.log(typeof details.credentials.username,typeof details.credentials.password);
     const data = new FormData();
     data.append('__VIEWSTATE', VIEWSTATE);
     data.append('__EVENTVALIDATION', EVENTVALIDATION);
@@ -320,7 +325,6 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
-  console.log(req.body)
    ////console.log(req.body);
     try{
     ////console.log("listen here, jackass")
