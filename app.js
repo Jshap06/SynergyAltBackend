@@ -13,9 +13,21 @@ const encryptionKey = process.env.encryptionkey;
 
 const app = express();
 
+const bannedIPs = new Set();
+bannedIPs.add("100.64.0.2");
+
+const checkIPBan = (req, res, next) => {
+    const clientIP = req.ip;
+
+    if (bannedIPs.has(clientIP)) {
+        return res.status(403).send('Your IP has been banned.');
+    }
+
+    next();
+};
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 5 minutes
+    windowMs: 30 * 60 * 1000, // 5 minutes
     max: 10000, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
     headers: true, // Adds RateLimit headers to responses
