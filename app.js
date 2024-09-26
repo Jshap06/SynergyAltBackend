@@ -16,12 +16,17 @@ const app = express();
 
 const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);next()};
 
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 5 minutes
-    max: 10000, // Limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
-    headers: true, // Adds RateLimit headers to responses
-  });
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000,
+  delayAfter: 100,
+  delayMs: 500,
+  keyGenerator:(req,res)=>{
+    return req.headers['x-forwarded-for'].split(',')[0]
+  }
+  onLimitReached: (req, res, options) => {
+    console.log(`Limit reached for IP: ${req.headers['x-forwarded-for'].split(',')[0]}`);
+  },
+});
 
 
 const taskMap = new Map();
