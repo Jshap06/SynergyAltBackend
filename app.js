@@ -19,7 +19,7 @@ bannedIPs.push("::ffff:100.64.0.2");
 const checkIPBan = (req, res, next) => {
     const clientIP = req.ip;
     console.log(clientIP);
-
+    console.log(bannedIPs);
     if (bannedIPs.includes(clientIP)) {
         return res.status(403).send('Your IP has been banned.');
     }
