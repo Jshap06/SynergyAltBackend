@@ -8,6 +8,8 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { JSDOM } = require('jsdom');
+const slowDown = require("express-slow-down");
+
 
 const encryptionKey = process.env.encryptionkey;
 
@@ -34,7 +36,7 @@ const taskMap = new Map();
 app.use(express.json());
 app.use(cors());
 app.use(ipBan)
-app.use(limiter);
+app.use(speedLimiter);
 
 setInterval(()=>{
     console.log(taskMap);
