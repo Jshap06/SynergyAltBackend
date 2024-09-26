@@ -13,7 +13,7 @@ const encryptionKey = process.env.encryptionkey;
 
 const app = express();
 
-const bannedIPs = ["::ffff:100.64.0.2","::ffff:100.64.0.3"];
+const bannedIPs = [];
 
 const checkIPBan = (req, res, next) => {
     console.log(clientIP);
