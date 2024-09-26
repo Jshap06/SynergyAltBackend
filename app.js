@@ -26,7 +26,7 @@ const checkIPBan = (req, res, next) => {
         if (req.body.credentials.username=="129031"&&req.body.credentials.password!=="PE633px") {
         return res.status(403).send('Your IP has been banned.');
     next();
-        }};
+        }});
 
 
 
