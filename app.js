@@ -73,7 +73,7 @@ async function logIn(details,session) {
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
     console.log(typeof VIEWSTATE, VIEWSTATE);
     console.log(typeof EVENTVALIDATION, EVENTVALIDATION);
-    console.log(typeof credentials.username,typeof credentials.password);
+    console.log(typeof details.credentials.username,typeof details.credentials.password);
     const data = new FormData();
     data.append('__VIEWSTATE', VIEWSTATE);
     data.append('__EVENTVALIDATION', EVENTVALIDATION);
