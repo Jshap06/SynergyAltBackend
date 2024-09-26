@@ -16,7 +16,6 @@ const app = express();
 const bannedIPs = [];
 
 const checkIPBan = (req, res, next) => {
-    console.log(clientIP);
     console.log(bannedIPs);
     if (bannedIPs.includes(req.ip)) {
         return res.status(403).send('Your IP has been banned.');
