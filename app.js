@@ -16,11 +16,13 @@ const app = express();
 
 
 const speedLimiter = slowDown({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  delayAfter: 100, // Allow 100 requests per window, then start slowing down
-  delayMs: 100, // Slow down subsequent responses by 500ms
+  windowMs: 15 * 60 * 1000,
+  delayAfter: 100,
+  delayMs: 500,
+  onLimitReached: (req, res, options) => {
+    console.log(`Limit reached for IP: ${req.ip}`);
+  },
 });
-
 
 const taskMap = new Map();
 
