@@ -330,7 +330,6 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
-    console.log(req.ip);
    ////console.log(req.body);
     try{
     ////console.log("listen here, jackass")
