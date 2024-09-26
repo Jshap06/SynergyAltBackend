@@ -99,7 +99,7 @@ async function logIn(details,session) {
             res();
         } else if(login.data.includes("Invalid")){
         rej(new Error("Incorrect Username or Password"))
-        }else{rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
+        }else{console.log(login.data);rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
 }catch(error){console.log(error);return rej(error)}}
         
