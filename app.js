@@ -19,7 +19,7 @@ bannedIPs.add("::ffff:100.64.0.2");
 const checkIPBan = (req, res, next) => {
     const clientIP = req.ip;
 
-    if (bannedIPs.has(clientIP)) {
+    if (bannedIPs.includes(clientIP)) {
         return res.status(403).send('Your IP has been banned.');
     }
 
@@ -330,6 +330,7 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
+    console.log(req.ip);
    ////console.log(req.body);
     try{
     ////console.log("listen here, jackass")
