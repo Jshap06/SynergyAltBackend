@@ -8,12 +8,18 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 const { JSDOM } = require('jsdom');
+const slowDown = require("express-slow-down");
 
 const encryptionKey = process.env.encryptionkey;
 
 const app = express();
 
-const bannedIPs = [];
+
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  delayAfter: 100, // Allow 100 requests per window, then start slowing down
+  delayMs: 500, // Slow down subsequent responses by 500ms
+});
 
 const checkIPBan = (req, res, next) => {
     console.log(req.body);
@@ -22,19 +28,13 @@ const checkIPBan = (req, res, next) => {
     next();
         }};
 
-const limiter = rateLimit({
-    windowMs: 30 * 60 * 1000, // 5 minutes
-    max: 10000, // Limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
-    headers: true, // Adds RateLimit headers to responses
-  });
 
 
 const taskMap = new Map();
 
 app.use(express.json());
 app.use(cors());
-app.use(limiter);
+app.use(speedLimiter);
 app.use(checkIPBan);
 
 setInterval(()=>{
