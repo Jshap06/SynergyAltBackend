@@ -69,6 +69,7 @@ function parseFormData(loginPage) {
 async function logIn(details,session) {
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
+    try{
     const response2 = await axios.get(url).catch(error=>{return rej(error)})
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
     console.log(typeof VIEWSTATE, VIEWSTATE);
@@ -100,7 +101,9 @@ async function logIn(details,session) {
         rej(new Error("Incorrect Username or Password"))
         }else{rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
-})}
+}catch(error){console.log(error);return rej(error)}}
+        
+        )}
 
 
 app.post('/getStudentPhoto',async (req, res)=>{
