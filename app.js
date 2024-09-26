@@ -292,7 +292,7 @@ app.post("/getAssignments",async(req,res)=>{
             if(!taskMap.get(details.cookies)[1].some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[Date.now(),[getAssignments(details,0)]]);var result = await taskMap.get(details.cookies)[1][0];}
             else{
             taskMap.get(details.cookies)[1].push(getAssignments(details,taskMap.get(details.cookies)[1].length-1))
-            var result=await taskMap.get(details.cookies)[1][taskMap.get(details.cookies).length-1];}
+            var result=await taskMap.get(details.cookies)[1][taskMap.get(details.cookies)[1].length-1];}
         }
         else{
     try {
