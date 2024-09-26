@@ -26,7 +26,7 @@ const taskMap = new Map();
 
 app.use(express.json());
 app.use(cors());
-app.use(slowDown)
+
 
 setInterval(()=>{
     console.log(taskMap);
