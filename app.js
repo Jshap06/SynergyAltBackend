@@ -15,7 +15,11 @@ const encryptionKey = process.env.encryptionkey;
 const app = express();
 
 
-
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  delayAfter: 100, // Allow 100 requests per window, then start slowing down
+  delayMs: 500, // Slow down subsequent responses by 500ms
+});
 
 const checkIPBan = (req, res, next) => {
     console.log(req.body);
@@ -31,6 +35,7 @@ const taskMap = new Map();
 app.use(express.json());
 app.use(cors());
 app.use(checkIPBan);
+app.use(
 
 setInterval(()=>{
     console.log(taskMap);
