@@ -14,7 +14,7 @@ const encryptionKey = process.env.encryptionkey;
 const app = express();
 
 
-const ipBan = (req,res,next)=>{console.log(req.connection.remoteAddress);next()};
+const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);next()};
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 5 minutes
