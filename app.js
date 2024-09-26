@@ -18,12 +18,13 @@ const app = express();
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000, // 15 minutes
   delayAfter: 100, // Allow 100 requests per window, then start slowing down
-  delayMs: 500, // Slow down subsequent responses by 500ms
+  delayMs: 100, // Slow down subsequent responses by 500ms
 });
 
 
 const taskMap = new Map();
 
+app.use(speedLimiter)
 app.use(express.json());
 app.use(cors());
 
