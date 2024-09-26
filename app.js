@@ -14,6 +14,8 @@ const encryptionKey = process.env.encryptionkey;
 const app = express();
 
 
+const ipBan = (req,res,next)=>{console.log(req.connection.remoteAddress);next()};
+
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 5 minutes
     max: 10000, // Limit each IP to 100 requests per windowMs
@@ -26,6 +28,7 @@ const taskMap = new Map();
 
 app.use(express.json());
 app.use(cors());
+app.use(ipBan)
 app.use(limiter);
 
 setInterval(()=>{
