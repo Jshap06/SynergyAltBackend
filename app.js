@@ -57,7 +57,7 @@ setInterval(async ()=>{
   for(const [domain,states] of viewStates){
     await axios.get(domain).then(response=>{
         const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
-    viewStates.set(this.domain,[VIEWSTATE,EVENTVALIDATION])}).catch(error=>{console.log(error);})}
+    viewStates.set(domain,[VIEWSTATE,EVENTVALIDATION])}).catch(error=>{console.log(error);})}
     
   
   
