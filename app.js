@@ -98,7 +98,7 @@ async function logIn(details,session) {
     console.log("another axios")
     const response2 = await axios.get(url).catch(error=>{return rej(error)})
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
-    viewStates.set(this.domain,[VIEWSTATE,EVENTVALIDATION])}
+    viewStates.set(details.domain,[VIEWSTATE,EVENTVALIDATION])}
     const data = new FormData();
     
     data.append('__VIEWSTATE', viewStates.get(this.domain)[0]);
