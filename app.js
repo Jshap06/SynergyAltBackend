@@ -15,6 +15,8 @@ const bannedIps=process.env.banList;
 
 const app = express();
 
+const viewStates=new Map()
+
 
 const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
 
@@ -49,6 +51,18 @@ setInterval(()=>{
 
 },1800000);
 
+
+//refresh viewStates
+setInterval(async ()=>{
+  for(const [domain,states] of viewStates){
+    await axios.get(domain).then(response=>{
+        const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
+    viewStates.set(this.domain,[VIEWSTATE,EVENTVALIDATION])}).catch(error=>{console.log(error);})}
+    
+  
+  
+},21600000)
+
 function decryptDetails(req){
     const bytes = CryptoJS.AES.decrypt(req.body.credentials.password, encryptionKey);
     const originalText = bytes.toString(CryptoJS.enc.Utf8);
@@ -80,11 +94,15 @@ async function logIn(details,session) {
     return new Promise(async (res, rej)=>{
     const url = details.domain+"/PXP2_Login_Student.aspx?regenerateSessionId=True";
     try{
+    if(!viewStates.has(details.domain)){
+    console.log("another axios")
     const response2 = await axios.get(url).catch(error=>{return rej(error)})
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
+    viewStates.set(this.domain,[VIEWSTATE,EVENTVALIDATION])}
     const data = new FormData();
-    data.append('__VIEWSTATE', VIEWSTATE);
-    data.append('__EVENTVALIDATION', EVENTVALIDATION);
+    
+    data.append('__VIEWSTATE', viewStates.get(this.domain)[0]);
+    data.append('__EVENTVALIDATION', viewStates.get(this.domain)[1]);
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
