@@ -10,20 +10,19 @@ require('dotenv').config();
 const { JSDOM } = require('jsdom');
 const slowDown = require("express-slow-down");
 
-
 const encryptionKey = process.env.encryptionkey;
+const bannedIps=process.env.banList;
 
 const app = express();
 
 
-const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);next()};
+const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
   delayAfter: 100,
   delayMs: 500,
   keyGenerator:(req,res)=>{
-    console.log(req.headers['x-forwarded-for']);
     return req.headers['x-forwarded-for'].split(',')[0]
   },
   onLimitReached: (req, res, options) => {
@@ -31,13 +30,13 @@ const speedLimiter = slowDown({
   },
 });
 
-
 const taskMap = new Map();
 
+app.use(ipBan);
+//app.use(speedLimiter) no can do, school is all one big ip...
 app.use(express.json());
 app.use(cors());
-app.use(ipBan)
-app.use(speedLimiter);
+
 
 setInterval(()=>{
     console.log(taskMap);
@@ -83,9 +82,6 @@ async function logIn(details,session) {
     try{
     const response2 = await axios.get(url).catch(error=>{return rej(error)})
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
-    console.log(typeof VIEWSTATE, VIEWSTATE);
-    console.log(typeof EVENTVALIDATION, EVENTVALIDATION);
-    console.log(typeof details.credentials.username,typeof details.credentials.password);
     const data = new FormData();
     data.append('__VIEWSTATE', VIEWSTATE);
     data.append('__EVENTVALIDATION', EVENTVALIDATION);
@@ -108,9 +104,9 @@ async function logIn(details,session) {
         if (login.data.includes("Good")){
             ////console.log("Logged in");
             res();
-        } else if(login.data.includes("Invalid")){
+        } else if(login.data.includes("Invalid")||login.data.includes("incorrect")){
         rej(new Error("Incorrect Username or Password"))
-        }else{console.log(login.data);rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
+        }else{rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
 
 }catch(error){console.log(error);return rej(error)}}
         
@@ -303,7 +299,7 @@ app.post("/getAssignments",async(req,res)=>{
             if(!taskMap.get(details.cookies)[1].some(item => !!item && typeof item.then === 'function')){taskMap.delete(details.cookies);taskMap.set(details.cookies,[Date.now(),[getAssignments(details,0)]]);var result = await taskMap.get(details.cookies)[1][0];}
             else{
             taskMap.get(details.cookies)[1].push(getAssignments(details,taskMap.get(details.cookies)[1].length-1))
-            var result=await taskMap.get(details.cookies)[1][taskMap.get(details.cookies).length-1];}
+            var result=await taskMap.get(details.cookies)[1][taskMap.get(details.cookies)[1].length-1];}
         }
         else{
     try {
@@ -340,6 +336,7 @@ app.post("/refresh",async(req,res)=>{
               withCredentials: true,
               jar: cookieJar
           }));
+          if(details.credentials.username==""){return rej(new Error("Username Cannot be Blank"))}
           await logIn(details,session)
             .then(res1=>{
                 cookieJar.getCookies(details.domain, (err, cookies) => {
