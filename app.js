@@ -336,6 +336,7 @@ app.post("/refresh",async(req,res)=>{
               withCredentials: true,
               jar: cookieJar
           }));
+          if(details.credentials.username==""){return rej(new Error("Username Cannot be Blank")})
           await logIn(details,session)
             .then(res1=>{
                 cookieJar.getCookies(details.domain, (err, cookies) => {
