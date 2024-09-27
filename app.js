@@ -101,8 +101,8 @@ async function logIn(details,session) {
     viewStates.set(details.domain,[VIEWSTATE,EVENTVALIDATION])}
     const data = new FormData();
     
-    data.append('__VIEWSTATE', viewStates.get(this.domain)[0]);
-    data.append('__EVENTVALIDATION', viewStates.get(this.domain)[1]);
+    data.append('__VIEWSTATE', viewStates.get(details.domain)[0]);
+    data.append('__EVENTVALIDATION', viewStates.get(details.domain)[1]);
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
