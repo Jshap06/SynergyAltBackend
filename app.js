@@ -255,6 +255,8 @@ app.post("/getHomePageGrades",async(req,res)=>{
         'Referer': details.domain+'/PXP2_GradeBook.aspx?AGU=0',
         'Cookie':details.cookies
     };
+    console.log("FUCK")
+    console.log(details.domain+"/PXP2_GradeBook.aspx?AGU=0"+details.selector)
     try{
         await axios.get(details.domain+"/PXP2_GradeBook.aspx?AGU=0"+details.selector,{headers:headers})
         .then(response=>{
