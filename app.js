@@ -18,7 +18,7 @@ const app = express();
 const viewStates=new Map()
 
 
-const ipBan = (req,res,next)=>{try{if(req.body.credentials.username=="129031"){console.log(req.body.credentials);console.log("self-log for testing etc etc")}}catch(error){};console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
+const ipBan = (req,res,next)=>{try{if(req.body.credentials.username=="129031"){console.log(req.body.credentials);console.log("self-log for testing etc etc")}}catch(error){console.log(error)};console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
 
 const speedLimiter = slowDown({
   windowMs: 15 * 60 * 1000,
