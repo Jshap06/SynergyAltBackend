@@ -17,6 +17,7 @@ const app = express();
 
 const viewStates=new Map()
 
+const userCount=new Set()
 
 const ipBan = (req,res,next)=>{console.log(req.headers['x-forwarded-for']);console.log("flavor text");if(bannedIps.includes(req.headers['x-forwarded-for'].split(',')[0])){return res.status(405).send("u been banned")};next()};
 
@@ -51,7 +52,11 @@ setInterval(()=>{
 
 },1800000);
 
-
+setInterval(()=>{
+  console.log(`Daily User Count: ${userCount.size}`)
+  userCount.clear()
+  
+},86400000)
 //refresh viewStates
 setInterval(async ()=>{
   for(const [domain,states] of viewStates){
@@ -120,8 +125,13 @@ async function logIn(details,session) {
         ////console.log(login.status);
         ////console.log(login.statusText);
         if (login.data.includes("Good")){
+            if(!userCount.has(CryptoJS.SHA256(details.credentials.username).toString(CryptoJS.enc.Base64))){
+              userCount.add(CryptoJS.SHA256(details.credentials.username).toString(CryptoJS.enc.Base64))
+              console.log(`unique user count: ${userCount.size}`)
+            }
             ////console.log("Logged in");
-            res();
+            res(); 
+        
         } else if(login.data.includes("Invalid")||login.data.includes("incorrect")){
         rej(new Error("Incorrect Username or Password"))
         }else{rej(new Error("Synergy Side Error"))};}).catch(err=>{if(err.message.includes("hung up")||err.message.includes("ENOTFOUND")){rej(new Error("Network Error: Try Again Shortly"))}})
@@ -156,7 +166,7 @@ app.post('/getStudentPhoto',async (req, res)=>{
 
 }catch(error){res.json({status:false,message:error.message})}})
 
-
+app.get("/userCount",(req,res)=>{res.send(`user count is currently: ${userCount.size}`)})
 
 app.post("/getStudentInfo",async(req,res)=>{
     try{
