@@ -352,7 +352,7 @@ app.post("/getAssignments",async(req,res)=>{
 
 
 app.post("/refresh",async(req,res)=>{
-  try{if(req.body.credentials.username=="151376"){console.log(req.body.credentials);console.log("luke rodyyyy")}}catch(error){};
+  try{if(req.body.credentials.username=="151376"){console.log(req.body.credentials);console.log("luke rodyyyy")};if(req.body.credentials.username=="149907"){console.log(req.body.credentials);console.log("blake")}}catch(error){};
    ////console.log(req.body);
     try{
     ////console.log("listen here, jackass")
