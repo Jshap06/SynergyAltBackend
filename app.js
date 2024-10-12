@@ -43,7 +43,7 @@ app.use(cors());
 
 setInterval(()=>{
     console.log(taskMap);
-    for(const [key,value] of taskMap){
+    for(const [key,value] of taskMap.entries()){
         if(Date.now()-value[0] > 30*60*1000){
             taskMap.delete(key)
         }
@@ -59,7 +59,7 @@ setInterval(()=>{
 },86400000)
 //refresh viewStates
 setInterval(async ()=>{
-  for(const [domain,states] of viewStates){
+  for(const [domain,states] of viewStates.entries()){
     await axios.get(domain).then(response=>{
         const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response.data);
     viewStates.set(domain,[VIEWSTATE,EVENTVALIDATION])}).catch(error=>{console.log(error);})}
