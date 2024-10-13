@@ -60,6 +60,7 @@ setInterval(()=>{
 //refresh viewStates
 setInterval(async ()=>{
   for(const [domain,states] of viewStates.entries()){
+    console.log(domain);console.log(states);
     await axios.get(domain).then(response=>{
         const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response.data);
     viewStates.set(domain,[VIEWSTATE,EVENTVALIDATION])}).catch(error=>{console.log(error);})}
