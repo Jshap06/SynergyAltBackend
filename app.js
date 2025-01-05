@@ -106,9 +106,13 @@ async function logIn(details,session) {
     const [VIEWSTATE, EVENTVALIDATION]=parseFormData(response2.data);
     viewStates.set(details.domain,[VIEWSTATE,EVENTVALIDATION])}
     const data = new FormData();
-    
+
+      /*
     data.append('__VIEWSTATE', viewStates.get(details.domain)[0]);
     data.append('__EVENTVALIDATION', viewStates.get(details.domain)[1]);
+    */
+    data.append('__VIEWSTATE', 'KqPt6wlg9HLuuLlSX53/rD7mGsT49olcEiHgIGu0TuIk9S0LrT7jEaeHzE7jedcJgydl3SSQdHtBc0PfdcHLRav+FEKdRk7r2w1xtnT/slc=')
+    data.append('__EVENTVALIDATION','5dI2iOuNOjTAFFi4STjKsHu5GHaIOEclJ8DAZ3FVavl2gH8Ig1lp51XsbgbvdKs1e++NLDqx2wHUG/Rkb65er4Yo3kM6/Uud9M7Dlu/9hY4YwoleqgO3i7yist40SodP1BSmvivKMuKrisMTjpDWsb2O+CmwJbtKA7JY3IzqSIM=')
     data.append('ctl00$MainContent$username', details.credentials.username);
     data.append('ctl00$MainContent$password', details.credentials.password);
     data.append('ctl00$MainContent$Submit1', 'Login');
