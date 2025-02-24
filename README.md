@@ -1,4 +1,6 @@
 # Grade Melon
+# NO LONGER USED
+
 Backend server for https://Grademelon.org
 
 ![static-site](public/logo.png)
